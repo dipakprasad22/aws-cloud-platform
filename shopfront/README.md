@@ -5,7 +5,6 @@ A globally-fast static storefront with a serverless contact form, built on AWS. 
 ## The problem
 A small retailer needs a fast, always-available storefront with a "request a quote" form that captures leads — without managing servers or paying for idle capacity.
 
-##Architecture Design
 ![Design](shopfront_architecture.svg)
 
 ### Three-tier breakdown
