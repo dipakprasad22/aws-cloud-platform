@@ -106,7 +106,7 @@ Notice: the policy names the *specific* table and topic ARNs, not `*`. The funct
 
 ### 2C. The function code
 
-1. On the function page → **Code** tab → replace the contents of `[Lambda function file](lambda_function.py)` 
+1. On the function page → **Code** tab → replace the contents of [Lambda function file](lambda_function.py) 
 
 2. Set the handler so Lambda calls `handler`: **Runtime settings** → **Edit** → **Handler** = `lambda_function.handler` → Save.
 3. Add the topic ARN as an environment variable so the code can read it: **Configuration** → **Environment variables** → **Edit** → **Add** → Key `TOPIC_ARN`, Value = your SNS topic ARN → Save.
