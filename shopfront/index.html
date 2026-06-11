@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopFront — Quality Retail</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>ShopFront</h1>
+    <p>Curated retail, delivered fast.</p>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h2>Welcome to ShopFront</h2>
+      <p>Browse our collections and get in touch for a custom quote.</p>
+    </section>
+
+    <section class="contact">
+      <h2>Request a quote</h2>
+      <form id="lead-form">
+        <input type="text" id="name" placeholder="Your name" required />
+        <input type="email" id="email" placeholder="Your email" required />
+        <textarea id="message" placeholder="What are you looking for?"></textarea>
+        <button type="submit">Send</button>
+      </form>
+      <p id="status"></p>
+    </section>
+  </main>
+
+  <footer><p>&copy; ShopFront</p></footer>
+
+  <script>
+    const API = "https://p9jw7w3q26.execute-api.us-east-1.amazonaws.com/lead";
+    document.getElementById("lead-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const status = document.getElementById("status");
+      status.textContent = "Sending...";
+      try {
+        const res = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            message: document.getElementById("message").value,
+          }),
+        });
+        const data = await res.json();
+        status.textContent = res.ok ? "Thanks! We'll be in touch." : (data.error || "Something went wrong.");
+        if (res.ok) e.target.reset();
+      } catch (err) {
+        status.textContent = "Network error — please try again.";
+      }
+    });
+  </script>
+</body>
+</html>
