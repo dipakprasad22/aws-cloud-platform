@@ -1,4 +1,4 @@
-# ShopFront — serverless retail storefront with lead capture
+# ShopFront — Serverless retail storefront with lead capture
 
 A globally-fast static storefront with a serverless contact form, built on AWS. Three-tier, serverless, runs at ~$0.
 

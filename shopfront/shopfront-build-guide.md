@@ -272,4 +272,4 @@ Do this to keep your account clean and at $0:
 7. **Route 53** → delete the `shopfront` A/Alias record. (Keep the hosted zone if you'll reuse the domain — note an idle hosted zone costs ~$0.50/month.)
 8. **ACM** (us-east-1) → delete the certificate.
 
-[shopfront-page](shopfront-page.png)
+![shopfront-page](shopfront-page.png)
