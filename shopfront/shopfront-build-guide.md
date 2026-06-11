@@ -106,7 +106,7 @@ Notice: the policy names the *specific* table and topic ARNs, not `*`. The funct
 
 ### 2C. The function code
 
-1. On the function page → **Code** tab → replace the contents of `lambda_function.py` 
+1. On the function page → **Code** tab → replace the contents of `(lambda_function.py)` 
 
 2. Set the handler so Lambda calls `handler`: **Runtime settings** → **Edit** → **Handler** = `lambda_function.handler` → Save.
 3. Add the topic ARN as an environment variable so the code can read it: **Configuration** → **Environment variables** → **Edit** → **Add** → Key `TOPIC_ARN`, Value = your SNS topic ARN → Save.
@@ -159,11 +159,11 @@ You should get `{"ok": true, "leadId": "..."}`, a new DynamoDB item, and an emai
 
 # PART 3 — PRESENTATION TIER
 
-## 3A. The static site files (refer to index.html and styles.css file)
+## 3A. The static site files (refer to '(index.html)' and '(styles.css)' file)
 
 **`index.html`** — replace `API_INVOKE_URL` with your API Gateway invoke URL:
 
-Open `index.html` locally in your browser and submit the form once — confirm it still hits your API (a new DynamoDB item + email). Now you know the front-end works before you even deploy it.
+Open `(index.html)` locally in your browser and submit the form once — confirm it still hits your API (a new DynamoDB item + email). Now you know the front-end works before you even deploy it.
 
 ## 3B. Private S3 bucket for the site
 
@@ -272,4 +272,4 @@ Do this to keep your account clean and at $0:
 7. **Route 53** → delete the `shopfront` A/Alias record. (Keep the hosted zone if you'll reuse the domain — note an idle hosted zone costs ~$0.50/month.)
 8. **ACM** (us-east-1) → delete the certificate.
 
-(./shopfront-page.png)
+(shopfront-page.png)
