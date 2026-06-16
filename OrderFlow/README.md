@@ -2,8 +2,6 @@
 
 The resilient, decoupled backend behind a checkout. One order is published once and processed by independent, retryable steps; nothing blocks, nothing is lost.
 
-## Architecture
-![architecture](./architecture.png)
 
 ### Flow
 API Gateway → intake Lambda → DynamoDB + SNS → 3 SQS queues (payment/inventory/notification) → 3 consumer Lambdas (+ DLQs). EventBridge routes special events; Step Functions orchestrates the ordered workflow with compensation; X-Ray traces the whole path.
