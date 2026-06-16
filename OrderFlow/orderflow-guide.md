@@ -1,4 +1,4 @@
-# Project 3 — OrderFlow: Build Guide
+# OrderFlow: Build Guide
 
 > An event-driven order-processing backend — the resilient, decoupled backbone behind a checkout.
 > Uses the full integration trio (SQS / SNS / EventBridge) + Step Functions orchestration + X-Ray tracing.
