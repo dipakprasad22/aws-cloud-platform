@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TaskHub</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #f4f5f7; color: #172b4d; }
+  header { background: #0052cc; color: #fff; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+  header h1 { font-size: 1.3rem; }
+  main { max-width: 900px; margin: 1.5rem auto; padding: 0 1rem; }
+  .card { background: #fff; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  input, select, textarea, button { font: inherit; padding: .55rem; border: 1px solid #dfe1e6; border-radius: 6px; }
+  button { background: #0052cc; color: #fff; border: 0; cursor: pointer; }
+  button.secondary { background: #ebecf0; color: #172b4d; }
+  button.danger { background: #de350b; }
+  .row { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+  .task { display: flex; justify-content: space-between; align-items: center; padding: .6rem 0; border-bottom: 1px solid #f0f1f3; }
+  .badge { font-size: .75rem; padding: .15rem .5rem; border-radius: 10px; background: #ebecf0; }
+  .todo { background:#ebecf0 } .in_progress { background:#fff0b3 } .done { background:#abf5d1 }
+  .hidden { display: none; }
+  label { font-size: .8rem; color: #5e6c84; display:block; margin-bottom:.2rem; }
+  h2 { margin-bottom: .8rem; } h3 { margin: .5rem 0; }
+  #msg { color: #de350b; min-height: 1.2rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TaskHub</h1>
+  <button id="logout" class="secondary hidden">Log out</button>
+</header>
+<main>
+  <p id="msg"></p>
+
+  <!-- AUTH -->
+  <section id="auth" class="card">
+    <h2 id="authTitle">Log in</h2>
+    <div class="row" style="flex-direction:column; align-items:stretch; max-width:360px">
+      <div id="nameField" class="hidden"><label>Name</label><input id="name" /></div>
+      <div><label>Email</label><input id="email" type="email" /></div>
+      <div><label>Password</label><input id="password" type="password" /></div>
+      <div class="row">
+        <button id="authBtn">Log in</button>
+        <button id="toggleAuth" class="secondary">Need an account? Register</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section id="app" class="hidden">
+    <div class="card">
+      <h2>New project</h2>
+      <div class="row">
+        <input id="projName" placeholder="Project name" />
+        <input id="projDesc" placeholder="Description (optional)" />
+        <button id="addProj">Add project</button>
+      </div>
+    </div>
+    <div id="projects"></div>
+  </section>
+</main>
+
+<script>
+// ---- CONFIG: set this to your API base (ALB DNS or domain), no trailing slash ----
+const API = "API_BASE_URL";
+
+let token = null, registering = false;
+const $ = (id) => document.getElementById(id);
+const msg = (t) => { $("msg").textContent = t || ""; };
+
+async function api(path, method = "GET", body) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = "Bearer " + token;
+  const res = await fetch(API + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  if (res.status === 204) return null;
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "request failed");
+  return data;
+}
+
+// ---- AUTH ----
+$("toggleAuth").onclick = () => {
+  registering = !registering;
+  $("authTitle").textContent = registering ? "Register" : "Log in";
+  $("authBtn").textContent = registering ? "Register" : "Log in";
+  $("nameField").classList.toggle("hidden", !registering);
+  $("toggleAuth").textContent = registering ? "Have an account? Log in" : "Need an account? Register";
+};
+$("authBtn").onclick = async () => {
+  msg("");
+  try {
+    const path = registering ? "/api/auth/register" : "/api/auth/login";
+    const body = { email: $("email").value, password: $("password").value };
+    if (registering) body.name = $("name").value;
+    const data = await api(path, "POST", body);
+    token = data.token;
+    showApp();
+  } catch (e) { msg(e.message); }
+};
+$("logout").onclick = () => { token = null; showAuth(); };
+
+function showApp() {
+  $("auth").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("logout").classList.remove("hidden");
+  loadProjects();
+}
+function showAuth() {
+  $("app").classList.add("hidden");
+  $("auth").classList.remove("hidden");
+  $("logout").classList.add("hidden");
+}
+
+// ---- PROJECTS ----
+$("addProj").onclick = async () => {
+  msg("");
+  try {
+    await api("/api/projects", "POST", { name: $("projName").value, description: $("projDesc").value });
+    $("projName").value = ""; $("projDesc").value = "";
+    loadProjects();
+  } catch (e) { msg(e.message); }
+};
+
+async function loadProjects() {
+  const projects = await api("/api/projects");
+  const wrap = $("projects"); wrap.innerHTML = "";
+  for (const p of projects) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<div class="row" style="justify-content:space-between">
+        <h3>${escape(p.name)}</h3>
+        <button class="danger" data-del="${p.id}">Delete project</button>
+      </div>
+      <p style="color:#5e6c84">${escape(p.description||"")}</p>
+      <div class="row" style="margin-top:.6rem">
+        <input placeholder="New task title" data-title="${p.id}" />
+        <select data-prio="${p.id}"><option value="low">low</option><option value="medium" selected>medium</option><option value="high">high</option></select>
+        <button data-addtask="${p.id}">Add task</button>
+      </div>
+      <div data-tasks="${p.id}"></div>`;
+    wrap.appendChild(card);
+    loadTasks(p.id);
+  }
+  wrap.querySelectorAll("[data-del]").forEach(b => b.onclick = async () => { await api("/api/projects/"+b.dataset.del, "DELETE"); loadProjects(); });
+  wrap.querySelectorAll("[data-addtask]").forEach(b => b.onclick = async () => {
+    const pid = b.dataset.addtask;
+    const title = wrap.querySelector(`[data-title="${pid}"]`).value;
+    const priority = wrap.querySelector(`[data-prio="${pid}"]`).value;
+    if (!title) return;
+    await api(`/api/projects/${pid}/tasks`, "POST", { title, priority });
+    loadTasks(pid);
+  });
+}
+
+// ---- TASKS ----
+async function loadTasks(projectId) {
+  const tasks = await api(`/api/projects/${projectId}/tasks`);
+  const box = document.querySelector(`[data-tasks="${projectId}"]`);
+  box.innerHTML = "";
+  for (const t of tasks) {
+    const el = document.createElement("div");
+    el.className = "task";
+    el.innerHTML = `<span>${escape(t.title)} <span class="badge ${t.priority}">${t.priority}</span></span>
+      <span class="row">
+        <select data-status="${t.id}">
+          ${["todo","in_progress","done"].map(s=>`<option value="${s}" ${s===t.status?"selected":""}>${s.replace("_"," ")}</option>`).join("")}
+        </select>
+        <button class="danger" data-deltask="${t.id}">x</button>
+      </span>`;
+    box.appendChild(el);
+    el.querySelector(`[data-status="${t.id}"]`).onchange = (e) =>
+      api(`/api/projects/${projectId}/tasks/${t.id}`, "PUT", { status: e.target.value });
+    el.querySelector(`[data-deltask="${t.id}"]`).onclick = async () => {
+      await api(`/api/projects/${projectId}/tasks/${t.id}`, "DELETE"); loadTasks(projectId);
+    };
+  }
+}
+
+function escape(s){ return (s||"").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+</script>
+</body>
+</html>

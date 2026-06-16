@@ -1,0 +1,21 @@
+{
+  "name": "taskhub-api",
+  "version": "1.0.0",
+  "description": "TaskHub - task & project management REST API (Express + PostgreSQL)",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node src/db/migrate.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "@aws-sdk/client-secrets-manager": "^3.600.0"
+  }
+}

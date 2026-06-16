@@ -257,19 +257,5 @@ If any step fails, the troubleshooting table below maps symptoms to fixes.
 | Site shows old content after re-upload | CloudFront cache TTL | Create an invalidation for `/*` (or use versioned filenames next time) |
 | SNS email never arrives | Subscription not confirmed | Confirm the subscription link in your inbox |
 
----
-
-# PART 6 — TEARDOWN 
-
-Do this to keep your account clean and at $0:
-
-1. **CloudFront** → select distribution → **Disable** → wait until disabled → **Delete**.
-2. **S3** → empty the bucket → delete the bucket.
-3. **API Gateway** → delete `shopfront-api`.
-4. **Lambda** → delete `shopfront-process-lead`.
-5. **DynamoDB** → delete `shopfront-leads`.
-6. **SNS** → delete the `shopfront-new-lead` topic (and subscription).
-7. **Route 53** → delete the `shopfront` A/Alias record. (Keep the hosted zone if you'll reuse the domain — note an idle hosted zone costs ~$0.50/month.)
-8. **ACM** (us-east-1) → delete the certificate.
 
 ![shopfront-page](shopfront-page.png)

@@ -15,11 +15,3 @@ API Gateway → intake Lambda → DynamoDB + SNS → 3 SQS queues (payment/inven
 
 ## When fan-out vs orchestration
 Fan-out (SNS+SQS) for independent parallel reactions; Step Functions for ordered dependent steps that may need rollback. OrderFlow uses both deliberately.
-
-## Cost
-Fully serverless, scales to zero, ~$0 at portfolio traffic.
-
-## What I'd improve next
-- Replace simulated steps with real payment/inventory integrations.
-- Add SQS FIFO where strict ordering matters.
-- Codify in Terraform.
